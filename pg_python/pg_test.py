@@ -15,7 +15,7 @@ test_table = "pg_python_test"
 class TestTests(unittest.TestCase):
 
     def setUp(self):
-        pg_python.pg_server("lucky", "lucky", "lucky", "localhost", False)
+        pg_python.pg_server("test_db", "postgres", "@pgtest", "localhost", False)
 
     def test_update(self):
         create_rows()
