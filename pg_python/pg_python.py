@@ -4,9 +4,12 @@ from ._read import make_postgres_read_statement, prepare_values
 from ._update import make_postgres_update_statement
 from ._update import make_postgres_update_multiple_statement
 from ._delete import make_postgres_delete_statement
+from ._update import make_postgres_update_multiple_column_statement
+from ._update import fill_missing_values, check_parameters_multicol
 import logging
 
 db_dict = {}
+
 
 
 def get_db(server="default"):
@@ -40,11 +43,13 @@ def write(table, kv_map, server="default"):
     global print_debug_log
     db_obj = get_db(server)
     connection = db_obj.get_connection()
-    cursor = db_obj.get_cursor()
+
     command, values = make_postgres_write_statement(table, kv_map, print_debug_log)
     try:
+        cursor = db_obj.get_cursor()
         cursor.execute(command, values)
         connection.commit()
+
     except Exception as e:
         logging.info("Db Cursor Write Error: %s" % e)
         db_obj_reconnect = Db(db_obj.params)
@@ -70,6 +75,7 @@ def read(table, keys_to_get, kv_map, limit=None, order_by=None, order_type=None,
     command, values = make_postgres_read_statement(table, kv_map, keys_to_get,
                                                    limit, order_by, order_type, print_debug_log,
                                                    clause, group_by, join_clause)
+
     try:
         cursor.execute(command, values)
         all_values = cursor.fetchall()
@@ -93,6 +99,8 @@ def update(table, update_kv_map, where_kv_map, clause='=', server="default"):
                                                      clause, print_debug_log)
     try:
         cursor.execute(command, values)
+        return_dict = {'Status': True}
+        logging.info("%s Record(s) Updated", cursor.rowcount)
         connection.commit()
     except Exception as e:
         logging.warning("Db Cursor Update Error: %s" % e)
@@ -100,7 +108,7 @@ def update(table, update_kv_map, where_kv_map, clause='=', server="default"):
         db_dict.pop(server)
         db_dict[server] = db_obj_reconnect
         return False
-    return True
+    return return_dict
 
 def read_raw(command, values, server="default"):
     """
@@ -190,9 +198,12 @@ def close(server="default"):
     logging.info("Closing connection for server %s" %server)
     db_obj = get_db(server)
     connection = db_obj.get_connection()
-    cursor = db_obj.get_cursor()
-    db_obj.close_cursor(cursor)
-    db_obj.close_connection()
+    try:
+        cursor = db_obj.get_cursor()
+        db_obj.close_cursor(cursor)
+        db_obj.close_connection()
+    except Exception as e:
+        logging.error("Could not close connection properly: %s" % e)
 
 
 def close_all():
@@ -214,6 +225,7 @@ def delete(table, where_kv_map, server="default"):
     command, values = make_postgres_delete_statement(table, where_kv_map, print_debug_log)
     try:
         cursor.execute(command, values)
+        logging.info("%s Record(s) Deleted" %cursor.rowcount)
         connection.commit()
     except Exception as e:
         logging.warning("Db Cursor Delete Error: %s" % e)
@@ -264,7 +276,7 @@ def update_multiple(table, column_to_update, columns_to_query_lst,
     cursor = db_obj.get_cursor()
     is_parameters_correct = check_parameters(column_to_update, columns_to_query_lst, query_values_dict_lst)
     if not is_parameters_correct:
-        logging.error("ERROR in parameters passsed")
+        logging.error("ERROR in parameters passed")
         return
 
     command, values = make_postgres_update_multiple_statement(table,
@@ -274,14 +286,61 @@ def update_multiple(table, column_to_update, columns_to_query_lst,
                                                               print_debug_log)
     try:
         cursor.execute(command, values)
+        return_dict = {'Status': True}
+        count = cursor.rowcount
+        return_dict['rowcount'] = count
+
         connection.commit()
     except Exception as e:
         logging.warning("Db Cursor update_multiple Error: %s" % e)
         db_obj_reconnect = Db(db_obj.params)
         db_dict.pop(server)
         db_dict[server] = db_obj_reconnect
-        return False
-    return True
+        return {'status': False}
+    return return_dict
+
+
+
+
+def update_multiple_col(table, columns_to_update_lst, columns_to_query_lst, query_values_dict_lst,
+                        server="default"):
+    """
+           Multiple update support in pg_python
+           :param table: table to update into
+           :param column_to_update: Single column for set clause
+           :param columns_to_query_lst: column names for where clause
+           :param query_values_dict_lst: values for where query and update params.
+           :return:
+           """
+    global print_debug_log
+    db_obj = get_db(server)
+    connection = db_obj.get_connection()
+    cursor = db_obj.get_cursor()
+    is_parameters_correct = check_parameters_multicol(columns_to_update_lst, columns_to_query_lst,
+                                                      query_values_dict_lst)
+    if not is_parameters_correct:
+        logging.error("ERROR in parameters passsed")
+        return
+
+    query_values_dict_lst = fill_missing_values(table, columns_to_update_lst,columns_to_query_lst, query_values_dict_lst, cursor)
+    command, values =  make_postgres_update_multiple_column_statement(table,
+                                                                      columns_to_update_lst,
+                                                                      columns_to_query_lst,
+                                                                      query_values_dict_lst,
+                                                                      print_debug_log)
+    try:
+        cursor.execute(command, values)
+        count = cursor.rowcount
+        connection.commit()
+    except Exception as e:
+        logging.warning("Db Cursor update_multiple Error: %s" % e)
+        db_obj_reconnect = Db(db_obj.params)
+        db_dict.pop(server)
+        db_dict[server] = db_obj_reconnect
+        return {'status': False}
+    return {'status':True, 'updated_records':count}
+
+
 
 def check_multiple_insert_param(columns_to_insert, insert_values_dict_lst):
     """
@@ -315,7 +374,7 @@ def insert_multiple(table, columns_to_insert_lst, insert_values_dict_lst, server
     cursor = db_obj.get_cursor()
     is_pararmeters_correct = check_multiple_insert_param(columns_to_insert_lst, insert_values_dict_lst)
     if not is_pararmeters_correct:
-        logging.error("ERROR in parameters passsed")
+        logging.error("ERROR in parameters passed")
         return
     command, values = make_postgres_write_multiple_statement(table, columns_to_insert_lst, insert_values_dict_lst,
                                                              print_debug_log)
