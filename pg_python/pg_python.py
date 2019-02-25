@@ -299,9 +299,6 @@ def update_multiple(table, column_to_update, columns_to_query_lst,
         return {'status': False}
     return return_dict
 
-
-
-
 def update_multiple_col(table, columns_to_update_lst, columns_to_query_lst, query_values_dict_lst,
                         server="default"):
     """
@@ -322,7 +319,6 @@ def update_multiple_col(table, columns_to_update_lst, columns_to_query_lst, quer
         logging.error("ERROR in parameters passsed")
         return
 
-    query_values_dict_lst = fill_missing_values(table, columns_to_update_lst,columns_to_query_lst, query_values_dict_lst, cursor)
     command, values =  make_postgres_update_multiple_column_statement(table,
                                                                       columns_to_update_lst,
                                                                       columns_to_query_lst,
@@ -339,8 +335,6 @@ def update_multiple_col(table, columns_to_update_lst, columns_to_query_lst, quer
         db_dict[server] = db_obj_reconnect
         return {'status': False}
     return {'status':True, 'updated_records':count}
-
-
 
 def check_multiple_insert_param(columns_to_insert, insert_values_dict_lst):
     """

@@ -1,7 +1,6 @@
 import logging
 
 
-
 def make_postgres_update_statement(table, kv_map, where_kv_map, clause, debug = True):
     _prefix = "UPDATE"
     clause = " " + clause + " "
@@ -170,72 +169,6 @@ def get_values_multicol(column_to_query_lst, column_to_update_lst, query_values_
             values.append(dict_row['update'][col])
     return values
 
-def get_subtable_for_missing(table, columns_to_update_lst,columns_to_query_lst, query_values_dict_lst, cur):
-    """
-        Return subtable to fill missing values for multirow multicolumn update
-        :param table: table to update into
-        :param column_to_update_lst: columns to be updated clause
-        :param columns_to_query_lst: column names for where clause
-        :param query_values_dict_lst: values for where and Set.
-        :return:
-        """
-    params_to_select = ",".join(columns_to_query_lst + columns_to_update_lst)
-    where_clause = []
-    where_values = []
-    for dict_row in query_values_dict_lst:
-        dict_row = dict_row['where']
-        for dict_item in dict_row.items():
-            where_clause.append(dict_item[0] + "=" + "%s")
-            where_values.append(dict_item[1])
-    where_clause = " or ".join(where_clause)
-    #Make the postgresql statement
-    stmt = "select " + params_to_select + " from " + table + " where " + where_clause
-    try:
-        cur.execute("BEGIN")
-        cur.execute("lock " + table + " in access exclusive mode")
-        cur.execute(stmt, where_values)
-        record = cur.fetchall()
-        logging.info("Selected subtable to fill missing values: %s, %s" % (stmt, where_values))
-        return record
-    except Exception as e:
-        logging.error("Could not select subtable: ", e)
-        return None
-
-def fill_missing_values(table, columns_to_update_lst,columns_to_query_lst, query_values_dict_lst, cur):
-    """
-       Multiple update support in pg_python
-       :param table: table to update into
-       :param column_to_update: Single column for set clause
-       :param columns_to_query_lst: column names for where clause
-       :param query_values_dict_lst: values for where query and update params.
-       :param cur: cursor object to make select and update statements.
-       :return:
-       """
-    record = get_subtable_for_missing(table, columns_to_update_lst, columns_to_query_lst, query_values_dict_lst, cur)
-    for dict_row in query_values_dict_lst:
-        update_params = dict_row['update']
-        where_params = dict_row['where']
-        len_where_params = len(where_params)
-        if len(update_params)==len(columns_to_update_lst):  #All update columns present, so pass
-            pass
-        else:
-            recs_to_ins = []
-            for rec in record:
-                result = list(rec[0:len_where_params])==list(where_params.values())
-                if result:
-                    recs_to_ins.extend(rec[len_where_params:])
-                    break
-
-            if len(recs_to_ins)>0:
-                for col in columns_to_update_lst:
-                    if col not in update_params:
-                        update_params[col] = recs_to_ins[columns_to_update_lst.index(col)]
-            else:
-                for col in columns_to_update_lst:
-                    if col not in update_params:
-                        update_params[col] = None
-    print(query_values_dict_lst)
-    return query_values_dict_lst
 
 def check_parameters_multicol(columns_to_update_lst, columns_to_query_lst, query_values_dict_lst):
     """
@@ -253,7 +186,7 @@ def check_parameters_multicol(columns_to_update_lst, columns_to_query_lst, query
             logging.error("%s doesn't match the dimensions" % (dict_val))
             return False
         #Check length of target columns
-        if len(dict_val['update'])>expected_length_target_cols:
+        if len(dict_val['update'])!=expected_length_target_cols:
             logging.error("%s doesn't match the dimensions" % (dict_val))
             return False
         # check columns present in update params
