@@ -261,13 +261,15 @@ def check_parameters(column_to_update, columns_to_query_lst, query_values_dict_l
     return True
 
 def update_multiple(table, column_to_update, columns_to_query_lst,
-                    query_values_dict_lst, server="default"):
+                    query_values_dict_lst, server="default", typecast = ""):
     """
     Multiple update support in pg_python
     :param table: table to update into
     :param column_to_update: Single column for set clause
     :param columns_to_query_lst: column names for where clause
     :param query_values_dict_lst: values for where and Set.
+    :param server: server from the pg_server's db_obj list
+    :param typecast: typecase statement to be appended after c.update e.g. "::int", must be a string
     :return:
     """
     global print_debug_log
@@ -278,12 +280,14 @@ def update_multiple(table, column_to_update, columns_to_query_lst,
     if not is_parameters_correct:
         logging.error("ERROR in parameters passed")
         return
-
+    if not isinstance(typecast, str):
+        logging.error("typecase param is not a string, it must be a string")
     command, values = make_postgres_update_multiple_statement(table,
                                                               column_to_update,
                                                               columns_to_query_lst,
                                                               query_values_dict_lst,
-                                                              print_debug_log)
+                                                              print_debug_log,
+                                                              typecast_suffix=typecast)
     try:
         cursor.execute(command, values)
         return_dict = {'Status': True}
