@@ -13,7 +13,12 @@ test_table = "pg_python_test"
 
 
 class TestTests(unittest.TestCase):
-
+    """
+    Please run the following in your local database before running the test cases:
+    1. A user postgres is required to be present with password "@pgtest"
+    2. create database test_db;
+    3. create table pg_python_test (col1 text, col2 text, col3 int, col4 text, int_value int)
+    """
     def setUp(self):
         pg_python.pg_server("test_db", "postgres", "@pgtest", "localhost", False)
 
