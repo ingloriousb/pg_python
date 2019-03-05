@@ -79,7 +79,8 @@ def get_values(column_to_query_lst, query_values_dict_lst ):
 def make_postgres_update_multiple_statement(table,column_to_update,
                                             columns_to_query_lst,
                                             query_values_dict_lst,
-                                            print_debug_log = True):
+                                            print_debug_log = True,
+                                            typecast_suffix = ""):
     """
     It makes query statement.
     :param table: table to update.
@@ -91,7 +92,7 @@ def make_postgres_update_multiple_statement(table,column_to_update,
     """
     _prefix = "UPDATE"
     table_name = table + " as t"
-    keys = column_to_update + " = c.update"
+    keys = column_to_update + " = c.update" + typecast_suffix + " "
     from_clause = get_from_clause(query_values_dict_lst, columns_to_query_lst)
     as_clause = get_as_clause(columns_to_query_lst)
     where_clause = get_where_clause(columns_to_query_lst)
@@ -220,6 +221,8 @@ def make_postgres_update_multiple_column_statement(table, columns_to_update_lst,
     where_clause = get_where_clause(columns_to_query_lst)
     statement = " ".join([_prefix, table_name, "SET", keys, from_clause, as_clause, where_clause])
     values = get_values_multicol(columns_to_query_lst, columns_to_update_lst, query_values_dict_lst)
+
     if print_debug_log == True:
         logging.info("Updating multiple rows into db %s, %s" % (statement, values))
+
     return statement, values
