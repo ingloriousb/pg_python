@@ -19,9 +19,9 @@ pg_python/pg_response.py
 pg_python/pg_table.py
 pg_python/pg_test.py
 pg_python/pg_time.py
-pg_python/pg_validate.py
 pg_python.egg-info/PKG-INFO
 pg_python.egg-info/SOURCES.txt
 pg_python.egg-info/dependency_links.txt
 pg_python.egg-info/not-zip-safe
+pg_python.egg-info/requires.txt
 pg_python.egg-info/top_level.txt

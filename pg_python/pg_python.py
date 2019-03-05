@@ -5,7 +5,7 @@ from ._update import make_postgres_update_statement
 from ._update import make_postgres_update_multiple_statement
 from ._delete import make_postgres_delete_statement
 from ._update import make_postgres_update_multiple_column_statement
-from ._update import fill_missing_values, check_parameters_multicol
+from ._update import check_parameters_multicol
 import logging
 
 db_dict = {}
