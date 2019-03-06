@@ -10,8 +10,6 @@ import logging
 
 db_dict = {}
 
-
-
 def get_db(server="default"):
     db_obj = db_dict.get(server, None)
     return db_obj
@@ -306,13 +304,16 @@ def update_multiple(table, column_to_update, columns_to_query_lst,
 def update_multiple_col(table, columns_to_update_lst, columns_to_query_lst, query_values_dict_lst,
                         server="default"):
     """
-           Multiple update support in pg_python
-           :param table: table to update into
-           :param column_to_update: Single column for set clause
-           :param columns_to_query_lst: column names for where clause
-           :param query_values_dict_lst: values for where query and update params.
-           :return:
-           """
+    Multiple update support in pg_python
+    :param table: table to update into, string
+    :param columns_to_update_lst: list of column names to be updated for set clause, list of strings
+    :param columns_to_query_lst: list of column names to be queried for where clause, list of strings
+    :param query_values_dict_lst: list of dictionaries with values for where query and update params. Has 2 items-
+            update dictionary - with key='update' and value as dictionary of column name and values to be updated
+            where dictionary - with key='where' and value as dictionary of column names and values to be queried
+            e.g. [{'where':{'id':1}, 'update':{'col1':'ABC', 'col2':'XYZ'}}]
+    :return: dictionary of status (boolean) and num of updated records - {'status':True,'updated_records':1}
+    """
     global print_debug_log
     db_obj = get_db(server)
     connection = db_obj.get_connection()
@@ -320,8 +321,8 @@ def update_multiple_col(table, columns_to_update_lst, columns_to_query_lst, quer
     is_parameters_correct = check_parameters_multicol(columns_to_update_lst, columns_to_query_lst,
                                                       query_values_dict_lst)
     if not is_parameters_correct:
-        logging.error("ERROR in parameters passsed")
-        return
+        logging.error("ERROR in parameters passed")
+        return {'status': False}
 
     command, values =  make_postgres_update_multiple_column_statement(table,
                                                                       columns_to_update_lst,

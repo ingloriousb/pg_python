@@ -33,24 +33,6 @@ class TestTests(unittest.TestCase):
         title2 = pg_python.read(test_table, [COL_4], {COL_1: 'title2'})
         self.assertEqual(title1[0][COL_4],'updated_name1')
         self.assertEqual(title2[0][COL_4], "update'd_name2")
-
-        clear_table()
-
-    def test_update_multicol(self):
-        create_rows()
-        cols_to_update = [COL_2, COL_3]
-        dict_lst =[
-            {'where':{COL_1:'title1'}, UPDATE:{COL_2 : 'updated_col2a', COL_3:'updated_col3a'}},
-            {'where':{COL_1:'title2'}, UPDATE:{COL_2 : 'updated_col2b', COL_3:'updated_col3b'}}
-        ]
-        pg_python.update_multiple_col(test_table,cols_to_update,[COL_1],dict_lst)
-        title1 = pg_python.read(test_table,[COL_2, COL_3],{COL_1:'title1'})
-        title2 = pg_python.read(test_table, [COL_2, COL_3], {COL_1: 'title2'})
-        self.assertEqual(title1[0][COL_2],'updated_col2a')
-        self.assertEqual(title1[0][COL_3], 'updated_col3a')
-        self.assertEqual(title2[0][COL_2], "updated_col2b")
-        self.assertEqual(title2[0][COL_3], "updated_col3b")
-        print("Update multiple row multiple column done")
         clear_table()
 
     def test_single_update(self):
@@ -92,7 +74,7 @@ class TestTests(unittest.TestCase):
         for row in rows:
             read_values.append(row.get(COL_1))
         self.assertEqual(sorted(read_values), sorted(values))
-        print("Read IN done")
+        print("Read in done")
         clear_table()
 
     def test_read_simple(self):
@@ -111,46 +93,25 @@ class TestTests(unittest.TestCase):
         print("Read greater than done")
         clear_table()
 
-    def test_update_return(self):
-        create_rows()
-        rows = pg_python.read(test_table, [COL_1], {COL_5 + " >": 10})
-        self.assertEqual(len(rows), 1)
-        self.assertEqual(rows[0][COL_1], 'title6')
-        print("Read greater than done")
-        clear_table()
-
 class UpdateTests(unittest.TestCase):
+    def setUp(self):
+        pg_python.pg_server("test_db", "postgres", "@pgtest", "localhost", False)
+
     def test_update_multicol(self):
         create_rows()
         cols_to_update = [COL_2, COL_3]
         dict_lst =[
-            {'where':{COL_1:'title1'}, UPDATE:{COL_2 : 'updated_col2a', COL_3:'updated_col3a'}},
-            {'where':{COL_1:'title2'}, UPDATE:{COL_2 : 'updated_col2b', COL_3:'updated_col3b'}}
+            {'where':{COL_1:'title1'}, UPDATE:{COL_2 : 'updated_col2a', COL_3:33}},
+             {'where':{COL_1:'title2'}, UPDATE:{COL_2 : 'updated_col2b', COL_3:34}
+            }
         ]
         pg_python.update_multiple_col(test_table,cols_to_update,[COL_1],dict_lst)
         title1 = pg_python.read(test_table,[COL_2, COL_3],{COL_1:'title1'})
         title2 = pg_python.read(test_table, [COL_2, COL_3], {COL_1: 'title2'})
         self.assertEqual(title1[0][COL_2],'updated_col2a')
-        self.assertEqual(title1[0][COL_3], 'updated_col3a')
-        self.assertEqual(title2[0][COL_2], "updated_col2b")
-        self.assertEqual(title2[0][COL_3], "updated_col3b")
-        print("Update multiple row multiple column done")
-        clear_table()
-
-    def test_update_multicol_wherenotmet(self):
-        create_rows()
-        cols_to_update = [COL_2, COL_3]
-        dict_lst =[
-            {'where':{COL_1:'title1'}, UPDATE:{COL_2 : 'updated_col2a', COL_3:'updated_col3a'}},
-            {'where':{COL_1:'title2not'}, UPDATE:{COL_2 : 'updated_col2b', COL_3:'updated_col3b'}}
-        ]
-        pg_python.update_multiple_col(test_table,cols_to_update,[COL_1],dict_lst)
-        title1 = pg_python.read(test_table, [COL_2, COL_3], {COL_1: 'title1'})
-        title2 = pg_python.read(test_table, [COL_2, COL_3], {COL_1: 'title2'})
-        self.assertEqual(title1[0][COL_2],'updated_col2a')
-        self.assertEqual(title1[0][COL_3], 'updated_col3a')
-        self.assertNotEqual(title2[0][COL_2], "updated_col2b")
-        self.assertNotEqual(title2[0][COL_3], "updated_col3b")
+        self.assertEqual(title1[0][COL_3], '33')
+        self.assertEqual(title2[0][COL_2], 'updated_col2b')
+        self.assertEqual(title2[0][COL_3], '34')
         print("Update multiple row multiple column done")
         clear_table()
 
@@ -159,14 +120,14 @@ class UpdateTests(unittest.TestCase):
         cols_to_query = [COL_1, COL_3]
         cols_to_update = [COL_2]
         dict_lst =[
-            {'where':{COL_1:'title1', COL_3:'76'}, UPDATE:{COL_2 : 'updated_col2a'}}
+            {'where':{COL_1:'title1', COL_3:76}, UPDATE:{COL_2 : 'updated_col2a'}}
         ]
         num = pg_python.update_multiple_col(test_table,cols_to_update,cols_to_query,dict_lst)
         self.assertEqual(num['updated_records'], 1)
         title1 = pg_python.read(test_table,[COL_2],{COL_1:'title1'})
 
         self.assertEqual(title1[0][COL_2],'updated_col2a')
-        print("Update multiple row multiple column done")
+        print("Update multiple row multiple column with two test conditions done")
         clear_table()
 
 def create_rows():
