@@ -22,7 +22,33 @@ class TestTests(unittest.TestCase):
     def setUp(self):
         pg_python.pg_server("test_db", "postgres", "@pgtest", "localhost", False)
 
+    def test_read_raw(self):
+        create_rows()
+        title1 = pg_python.read_raw("select col1,col3 from "+test_table+" where col2=%s",('read',))
+        self.assertEqual(title1[0][0],"title1")
+        self.assertEqual(title1[0][1], 76)
+        print("Read raw done")
+        clear_table()
+
+    def test_write_raw(self):
+        create_rows()
+        values = ['title7','read7',77]
+        pg_python.write_raw("insert into "+test_table+" values (%s,%s,%s)",values)
+        title1 = pg_python.read(test_table,[COL_2,COL_3],{COL_1:'title7'})
+        self.assertEqual(title1[0][COL_2], "read7")
+        self.assertEqual(title1[0][COL_3], "77")
+        print("Write raw done")
+        clear_table()
+
     def test_update(self):
+        create_rows()
+        pg_python.update(test_table,{COL_4:'updated_name1'},{COL_1:'title1%'},clause='ilike')
+        title1 = pg_python.read(test_table,[COL_4],{COL_1:'title15'})
+        self.assertEqual(title1[0][COL_4],'updated_name1')
+        print("Update single row done")
+        clear_table()
+
+    def test_multiple_update(self):
         create_rows()
         dict_lst =[
             {COL_1:'title1', UPDATE:'updated_name1'},
@@ -33,13 +59,7 @@ class TestTests(unittest.TestCase):
         title2 = pg_python.read(test_table, [COL_4], {COL_1: 'title2'})
         self.assertEqual(title1[0][COL_4],'updated_name1')
         self.assertEqual(title2[0][COL_4], "update'd_name2")
-        clear_table()
-
-    def test_single_update(self):
-        create_rows()
-        pg_python.update(test_table,{COL_4:'updated_name1'},{COL_1:'title1%'},clause='ilike')
-        title1 = pg_python.read(test_table,[COL_4],{COL_1:'title15'})
-        self.assertEqual(title1[0][COL_4],'updated_name1')
+        print("Update multiple done")
         clear_table()
 
     def test_multiple_insert(self):
@@ -55,6 +75,7 @@ class TestTests(unittest.TestCase):
         val3 = pg_python.read(test_table, [COL_1], {COL_3: 3})
         values = [val1[0][COL_1],val2[0][COL_1],val3[0][COL_1] ]
         self.assertEqual(values,["insert1","insert2","insert3"])
+        print("Insert multiple done")
         clear_table()
 
     def test_update_raw(self):
@@ -91,6 +112,15 @@ class TestTests(unittest.TestCase):
         self.assertEqual(len(rows), 1)
         self.assertEqual(rows[0][COL_1], 'title6')
         print("Read greater than done")
+        clear_table()
+
+    def test_delete(self):
+        create_rows()
+        where_kv_map={COL_1:'title15'}
+        pg_python.delete(test_table, where_kv_map)
+        read=pg_python.read(test_table,[COL_2], {COL_1:'title15'})
+        self.assertEqual(read,[])
+        print("Delete row done")
         clear_table()
 
 class UpdateTests(unittest.TestCase):
@@ -140,6 +170,3 @@ def create_rows():
 
 def clear_table():
     pg_python.write_raw("Delete from %s"%(test_table), None)
-
-
-

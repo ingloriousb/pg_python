@@ -4,10 +4,10 @@ import logging
 def make_postgres_update_statement(table, kv_map, where_kv_map, clause, debug = True):
     _prefix = "UPDATE"
     clause = " " + clause + " "
-    keys = ", ".join([k + "=%s" for k in list(kv_map.keys())])
+    keys = ",".join([k + "=%s" for k in list(kv_map.keys())])
     where_keys = " AND ".join([k + clause + "%s" for k in list(where_kv_map.keys())])
     value_proxy_array = ["%s"] * len(kv_map)
-    value_proxy_string = ", ".join(value_proxy_array)
+    value_proxy_string = " , ".join(value_proxy_array)
     statement = " ".join([_prefix, table, "SET", keys, "WHERE", where_keys])
     if debug:
         logging.info("Updating into Db: %s, %s" %(statement, list(kv_map.values()) + list(where_kv_map.values())))
@@ -116,7 +116,7 @@ def make_keys_multicol(columns_to_update_lst):
         temp_str = key + " = c.update" + key
         update_lst.append("update" +key)
         key_equal.append(temp_str)
-    joined_str = ", ".join(key_equal)
+    joined_str = ",".join(key_equal)
     return joined_str, update_lst
 
 
