@@ -1,19 +1,18 @@
 """
 This file contains the code for making chunks out of a line or a phrase.
 """
-import spacy
-from spacy.lang.en.stop_words import STOP_WORDS
-
-nlp = spacy.load('en')
 
 
 def acceptable_word(word):
+    from spacy.lang.en.stop_words import STOP_WORDS
     """Checks conditions for acceptable word: length, stopword."""
     accepted = bool(2 <= len(word) <= 40 and word.lower() not in STOP_WORDS)
     return accepted
 
 
 def get_chunks(text):
+    import spacy
+    nlp = spacy.load('en')
     doc = nlp(text)
     chunks = []
     for np in doc.noun_chunks:
