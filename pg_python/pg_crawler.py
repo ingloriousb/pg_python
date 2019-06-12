@@ -1,9 +1,9 @@
-from _db_object import Db
-from _write import make_postgres_write_statement,make_postgres_write_multiple_statement
-from _read import make_postgres_read_statement, prepare_values
-from _update import make_postgres_update_statement
-from _update import make_postgres_update_multiple_statement
-from _delete import make_postgres_delete_statement
+from ._db_object import Db
+from ._write import make_postgres_write_statement,make_postgres_write_multiple_statement
+from ._read import make_postgres_read_statement, prepare_values
+from ._update import make_postgres_update_statement
+from ._update import make_postgres_update_multiple_statement
+from ._delete import make_postgres_delete_statement
 
 
 crawler_db = None
@@ -17,13 +17,15 @@ print_debug_log = True
 params_map = {}
 
 
-def pg_server(db_name, username, password, host_address, debug=True):
+def pg_server(db_name, username, password, host_address, debug=True, send_keep_alive_probes=False, socket_idle_time=120):
   global crawler_db, print_debug_log, params_map
   params_map = {
     'dbname': db_name,
     'user': username,
     'password': password,
     'host': host_address,
+    'send_keep_alive_probes': send_keep_alive_probes,
+    'socket_idle_time': socket_idle_time,
     }
   crawler_db = Db(params_map)
   print_debug_log = debug

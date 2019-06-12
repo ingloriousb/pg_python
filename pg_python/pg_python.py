@@ -17,13 +17,15 @@ def get_db(server="default"):
 print_debug_log = True
 
 
-def pg_server(db_name, username, password, host_address, debug=True, server="default"):
+def pg_server(db_name, username, password, host_address, debug=True, server="default", send_keep_alive_probes=False, socket_idle_time=120):
     global print_debug_log
     params_map = {
         'dbname'  : db_name,
         'user'    : username,
         'password': password,
         'host'    : host_address,
+        'send_keep_alive_probes': send_keep_alive_probes,
+        'socket_idle_time': socket_idle_time,
     }
     db_obj = Db(params_map)
     db_dict[server] = db_obj
