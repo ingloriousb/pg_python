@@ -1,6 +1,6 @@
 Metadata-Version: 1.1
 Name: pg-python
-Version: 1.505
+Version: 1.506
 Summary: A Library to communicate with postgres from python
 Home-page: http://github.com/ingloriousb/pg_python
 Author: Gaurav Bhati

@@ -26,7 +26,8 @@ def make_postgres_read_statement(table, kv_map, keys_to_get, limit, order_by,
         logging.info("Reading From Db: %s, %s" %(statement, list(kv_map.values())))
     return statement, values
 
-def prepare_values(all_values, keys_to_get):
+
+def prepare_values(all_values, keys_to_get, convert_to_str):
     ret_val = []
     if all_values is None:
         return None
@@ -35,7 +36,11 @@ def prepare_values(all_values, keys_to_get):
         row_kv = {}
         if len(row) == len(keys_to_get):
             for idx in range(0, len(row)):
-                row_kv[k[idx]] = str(row[idx])
+                if convert_to_str:
+                    row_kv[k[idx]] = str(row[idx])
+                else:
+                    row_kv[k[idx]] = row[idx]
+
         else:
             logging.error("Number of keys to be fetched are not correct")
             continue

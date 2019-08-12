@@ -59,7 +59,7 @@ def write(table, kv_map, server="default"):
     return True
 
 def read(table, keys_to_get, kv_map, limit=None, order_by=None, order_type=None, clause="=", group_by=None,
-         join_clause=' AND ', server="default"):
+         join_clause=' AND ', server="default", convert_to_str=True):
     """
     :param table: String
     :param keys_to_get: list of strings
@@ -79,7 +79,7 @@ def read(table, keys_to_get, kv_map, limit=None, order_by=None, order_type=None,
     try:
         cursor.execute(command, values)
         all_values = cursor.fetchall()
-        return prepare_values(all_values, keys_to_get)
+        return prepare_values(all_values, keys_to_get, convert_to_str)
     except Exception as e:
         logging.warning("Db Cursor Read Error: %s" % e)
         return []
