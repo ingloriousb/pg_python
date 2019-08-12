@@ -58,15 +58,26 @@ def write(table, kv_map, server="default"):
         return False
     return True
 
-def read(table, keys_to_get, kv_map, limit=None, order_by=None, order_type=None, clause="=", group_by=None,
-         join_clause=' AND ', server="default", cols_keep_raw_type=[]):
+def read(table, keys_to_get, kv_map, limit=None, order_by=None, order_type=None,
+         clause="=", group_by=None, join_clause=' AND ', server="default",
+         cols_keep_raw_type=[]):
     """
+
     :param table: String
     :param keys_to_get: list of strings
     :param kv_map: key value map, if this is None, then limit is maxed at 1000
     :param limit: None or integer
     :param order_by: None or must be of a type String
     :param order_type: String None, "ASC" or "DESC" only
+
+    :param clause: a clause other than default " = " clause between where key value pairs.
+            e.g. "where x in y" implies clause will be "in":
+             Currently we support a single clause in one function call.
+
+    :param group_by: sql group by
+    :param join_clause: the operation between different where clauses
+    :param server: server types
+    :param cols_keep_raw_type: cols where we want to keep the raw data type.
     :return: values in an array of key value maps
     """
     error_return = None
