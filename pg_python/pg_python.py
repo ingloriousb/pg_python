@@ -10,6 +10,7 @@ import logging
 
 db_dict = {}
 
+
 def get_db(server="default"):
     db_obj = db_dict.get(server, None)
     return db_obj
@@ -58,6 +59,7 @@ def write(table, kv_map, server="default"):
         return False
     return True
 
+
 def read(table, keys_to_get, kv_map, limit=None, order_by=None, order_type=None,
          clause="=", group_by=None, join_clause=' AND ', server="default",
          cols_keep_raw_type=[]):
@@ -95,6 +97,7 @@ def read(table, keys_to_get, kv_map, limit=None, order_by=None, order_type=None,
         logging.warning("Db Cursor Read Error: %s" % e)
         return []
 
+
 def update(table, update_kv_map, where_kv_map, clause='=', server="default"):
     """
     :param table: table name, type string
@@ -121,6 +124,7 @@ def update(table, update_kv_map, where_kv_map, clause='=', server="default"):
         return False
     return return_dict
 
+
 def read_raw(command, values, server="default"):
     """
     :param table: String
@@ -143,6 +147,7 @@ def read_raw(command, values, server="default"):
     except Exception as e:
         logging.warning("Db Cursor Read Error: %s" % e)
         return []
+
 
 def write_raw(command, values, server="default"):
     """
@@ -186,6 +191,7 @@ def update_raw(command, server="default"):
         return -1
     return rowcount
 
+
 class bcolors:
     HEADER = '\033[95m'
     OKBLUE = '\033[94m'
@@ -196,14 +202,18 @@ class bcolors:
     BOLD = '\033[1m'
     UNDERLINE = '\033[4m'
 
+
 def print_ok(s):
     print((bcolors.OKGREEN + s + bcolors.ENDC))
+
 
 def print_warn(s):
     print((bcolors.WARNING + s + bcolors.ENDC))
 
+
 def print_fail(s):
     print((bcolors.FAIL + s + bcolors.ENDC))
+
 
 def close(server="default"):
     logging.info("Closing connection for server %s" %server)
@@ -246,6 +256,7 @@ def delete(table, where_kv_map, server="default"):
         return False
     return True
 
+
 def check_parameters(column_to_update, columns_to_query_lst, query_values_dict_lst):
     """
     check_prarameters checks whether the passed parameters are valid or not.
@@ -270,6 +281,7 @@ def check_parameters(column_to_update, columns_to_query_lst, query_values_dict_l
                 logging.error("%s column isn't present in dictionary" % (column))
                 return False
     return True
+
 
 def update_multiple(table, column_to_update, columns_to_query_lst,
                     query_values_dict_lst, server="default", typecast = ""):
@@ -314,6 +326,7 @@ def update_multiple(table, column_to_update, columns_to_query_lst,
         return {'status': False}
     return return_dict
 
+
 def update_multiple_col(table, columns_to_update_lst, columns_to_query_lst, query_values_dict_lst,
                         server="default"):
     """
@@ -354,6 +367,7 @@ def update_multiple_col(table, columns_to_update_lst, columns_to_query_lst, quer
         return {'status': False}
     return {'status':True, 'updated_records':count}
 
+
 def check_multiple_insert_param(columns_to_insert, insert_values_dict_lst):
     """
     Checks if the pararmeter passed are of correct order.
@@ -371,6 +385,7 @@ def check_multiple_insert_param(columns_to_insert, insert_values_dict_lst):
                 logging.error("%s column isn't present in dictionary" % (column))
                 return False
     return True
+
 
 def insert_multiple(table, columns_to_insert_lst, insert_values_dict_lst, server="default"):
     """
