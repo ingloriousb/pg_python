@@ -24,10 +24,11 @@ def make_postgres_read_statement(table, kv_map, keys_to_get, limit, order_by,
     _null_key_string = ""
     if len(null_keys) > 0:
         _null_key_string = _join_by.join([k + " is null " for k in null_keys])
-    if len(_key_string) > 2:
-        _key_string = _key_string + " and " + _null_key_string
-    else:
-        _key_string = _key_string + " " + _null_key_string
+    if len(_null_key_string) > 2:
+        if len(_key_string) > 2:
+            _key_string = _key_string + " and " + _null_key_string
+        else:
+            _key_string = _key_string + " " + _null_key_string
 
     values = list(kv_map.values())
 
