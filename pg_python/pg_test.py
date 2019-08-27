@@ -101,7 +101,7 @@ class TestTests(unittest.TestCase):
     def test_read_null(self):
         create_rows()
         values = ['null']
-        rows = pg_python.read(test_table, [COL_1,COL_4], {COL_2: values[0]})
+        rows = pg_python.read(test_table, [COL_1,COL_4], {COL_1: 'title-null', COL_2: values[0]})
         read_values = []
         read_values_4 = []
         for row in rows:
