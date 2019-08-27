@@ -6,7 +6,25 @@ def make_postgres_read_statement(table, kv_map, keys_to_get, limit, order_by,
     _prefix = "SELECT"
     _join_by = " " + join_clause + " "
     _table_string = " ".join(["FROM", table])
+    null_keys = []
+
+    for key in kv_map.keys():
+        kval = kv_map.get(key)
+        try:
+            if str(kval).lower() == 'null':
+                null_keys.append(key)
+        except Exception as e:
+            continue
+
+    for key in null_keys:
+        if key in kv_map:
+            kv_map.pop(key, None)
+
     _key_string = _join_by.join([k + clause + "%s" for k in list(kv_map.keys())])
+    _null_key_string = ""
+    if len(null_keys) > 0:
+        _null_key_string = _join_by.join([k + " is null " for k in null_keys])
+    _key_string = _key_string + " " + _null_key_string
     values = list(kv_map.values())
 
     if clause.strip().lower() == "in":
@@ -14,7 +32,7 @@ def make_postgres_read_statement(table, kv_map, keys_to_get, limit, order_by,
         _key_string = _join_by.join([k + clause + "(" + ",".join("'" + x + "'" for x in kv_map[k]) + ")" for k in list(kv_map.keys())])
 
     statement = " ".join([_prefix, ", ".join(sorted(keys_to_get)), _table_string])
-    if len(list(kv_map.keys())) > 0:
+    if len(list(kv_map.keys())) > 0 or len(null_keys) > 0:
       statement = " ".join([_prefix, ", ".join(sorted(keys_to_get)), _table_string, "WHERE", _key_string])
     if group_by is not None:
         statement += " GROUP BY " + group_by
