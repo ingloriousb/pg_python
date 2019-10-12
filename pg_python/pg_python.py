@@ -52,7 +52,7 @@ def write(table, kv_map, server="default"):
         connection.commit()
 
     except Exception as e:
-        logging.info("Db Cursor Write Error: %s" % e)
+        logging.error("Db Cursor Write Error: %s" % e)
         db_obj_reconnect = Db(db_obj.params)
         db_dict.pop(server)
         db_dict[server] = db_obj_reconnect
@@ -103,6 +103,8 @@ def update(table, update_kv_map, where_kv_map, clause='=', server="default"):
     :param table: table name, type string
     :param update_kv_map: the NEW keyvalue map for values to be updated
     :param where_kv_map: the kv map to search for values, all values ARE ANDed.
+    :param clause:
+    :param server:
     :return: Success or Failure.
     """
     global print_debug_log
@@ -114,10 +116,11 @@ def update(table, update_kv_map, where_kv_map, clause='=', server="default"):
     try:
         cursor.execute(command, values)
         return_dict = {'Status': True}
-        logging.info("%s Record(s) Updated", cursor.rowcount)
+        if print_debug_log:
+            logging.info("%s Record(s) Updated", cursor.rowcount)
         connection.commit()
     except Exception as e:
-        logging.warning("Db Cursor Update Error: %s" % e)
+        logging.error("Db Cursor Update Error: %s" % e)
         db_obj_reconnect = Db(db_obj.params)
         db_dict.pop(server)
         db_dict[server] = db_obj_reconnect
@@ -216,7 +219,7 @@ def print_fail(s):
 
 
 def close(server="default"):
-    logging.info("Closing connection for server %s" %server)
+    logging.warning("Closing connection for server %s" %server)
     db_obj = get_db(server)
     connection = db_obj.get_connection()
     try:
@@ -246,10 +249,10 @@ def delete(table, where_kv_map, server="default"):
     command, values = make_postgres_delete_statement(table, where_kv_map, print_debug_log)
     try:
         cursor.execute(command, values)
-        logging.info("%s Record(s) Deleted" %cursor.rowcount)
+        logging.warning("%s Record(s) Deleted" %cursor.rowcount)
         connection.commit()
     except Exception as e:
-        logging.warning("Db Cursor Delete Error: %s" % e)
+        logging.error("Db Cursor Delete Error: %s" % e)
         db_obj_reconnect = Db(db_obj.params)
         db_dict.pop(server)
         db_dict[server] = db_obj_reconnect

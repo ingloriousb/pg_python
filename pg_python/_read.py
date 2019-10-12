@@ -64,8 +64,6 @@ def prepare_values(all_values, keys_to_get, cols_keep_raw_type=[]):
                     row_kv[k[idx]] = row[idx]
                 else:
                     row_kv[k[idx]] = str(row[idx])
-
-
         else:
             logging.error("Number of keys to be fetched are not correct")
             continue

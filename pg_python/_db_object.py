@@ -15,7 +15,7 @@ class Db(object):
         self._make_connection()
 
     def _make_connection(self):
-        logging.info(self.params)
+        logging.debug(self.params)
         try:
             self.connection = psycopg2.connect(**self.params)
             if self.send_keep_alive_probes:
@@ -61,11 +61,11 @@ class Db(object):
                 cursor = self.connection.cursor()
                 return cursor
             except Exception as e:
-                logging.warning("Connection could not be made: %s" % e)
+                logging.error("Connection could not be made: %s" % e)
                 return None
 
     def close_cursor(self, cursor):
-        logging.info("Closing cursor...")
+        logging.debug("Closing cursor...")
         cursor.close()
 
     def commit(self):
