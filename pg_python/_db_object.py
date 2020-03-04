@@ -10,7 +10,6 @@ class Db(object):
 
     def __init__(self, params):
         self.params = params
-        self.params['application_name'] = params.pop('application_name', False)
         self.params['keepalives'] = 1
         self.params['keepalives_idle'] = 120
         self.params['keepalives_interval'] = 120
