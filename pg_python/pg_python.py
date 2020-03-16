@@ -7,8 +7,27 @@ from ._delete import make_postgres_delete_statement
 from ._update import make_postgres_update_multiple_column_statement
 from ._update import check_parameters_multicol
 import logging
+import signal
 
 db_dict = {}
+
+
+class timeout:
+    """Need because of sometimes query will take very long
+    (cause of connection already killed and tring to execute query)"""
+    def __init__(self, seconds=1, error_message='Timeout'):
+        self.seconds = seconds
+        self.error_message = error_message
+
+    def handle_timeout(self, signum, frame):
+        raise TimeoutError(self.error_message)
+
+    def __enter__(self):
+        signal.signal(signal.SIGALRM, self.handle_timeout)
+        signal.alarm(self.seconds)
+
+    def __exit__(self, type, value, traceback):
+        signal.alarm(0)
 
 
 def get_db(server="default"):
@@ -20,7 +39,7 @@ print_debug_log = True
 
 def server_connection_check(func):
     def wrapper(*args, **kwargs):
-        server = kwargs['server']
+        server = kwargs.get('server', 'default')
         db_obj = get_db(server)
         if db_obj.connection.closed != 0:
             logging.info('reconnection to db because of connection closed %s' % db_obj.connection.closed)
@@ -28,7 +47,11 @@ def server_connection_check(func):
         else:
             cursor = db_obj.get_cursor()
             try:
-                cursor.execute('SELECT 1', [])
+                with timeout(seconds=10):
+                    cursor.execute('SELECT 1', [])
+            except TimeoutError as e:
+                logging.info('timeout occurred, reconnecting dbs')
+                db_obj._make_connection()
             except Exception as e:
                 logging.info('reconnection to db because of %s' % e)
                 db_obj._make_connection()
