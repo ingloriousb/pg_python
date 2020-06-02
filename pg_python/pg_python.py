@@ -41,6 +41,9 @@ def server_connection_check(func):
     def wrapper(*args, **kwargs):
         server = kwargs.get('server', 'default')
         db_obj = get_db(server)
+        if db_obj is None:
+            logging.info('could not got db object for %s' % server)
+            logging.info('db dict %s' % str(db_dict))
         if db_obj.connection.closed != 0:
             logging.info('reconnection to db because of connection closed %s' % db_obj.connection.closed)
             db_obj._make_connection()
