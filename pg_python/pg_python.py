@@ -72,6 +72,7 @@ def pg_server(db_name, username, password, host_address, debug=True, server="def
     db_obj = Db(params_map)
     db_dict[server] = db_obj
     print_debug_log = debug
+    logging.info('connected to %s with server %s' % (host_address, server))
     return db_obj
 
 
