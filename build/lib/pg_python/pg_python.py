@@ -57,6 +57,7 @@ def server_connection_check(func):
             except Exception as e:
                 logging.info('reconnection to db because of %s' % e)
                 db_obj._make_connection()
+        logging.info('connection is working')
         return func(*args, **kwargs)
 
     return wrapper
