@@ -15,7 +15,7 @@ class Db(object):
         self._make_connection()
 
     def _make_connection(self):
-        logging.debug(self.params)
+        # logging.debug(self.params) exposing connection info in debug
         try:
             self.connection = psycopg2.connect(**self.params)
             if self.send_keep_alive_probes:
