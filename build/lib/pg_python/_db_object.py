@@ -16,7 +16,7 @@ class Db(object):
         self._make_connection()
 
     def _make_connection(self):
-        logging.debug(self.params)
+        # logging.debug(self.params) exposing connection info in log
         try:
             self.connection = psycopg2.connect(**self.params)
         except psycopg2.DatabaseError as e:
