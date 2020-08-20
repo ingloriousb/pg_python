@@ -76,18 +76,19 @@ def get_values(column_to_query_lst, query_values_dict_lst ):
             values.append(dict_row[col])
     return values
 
+
 def make_postgres_update_multiple_statement(table,column_to_update,
                                             columns_to_query_lst,
                                             query_values_dict_lst,
                                             print_debug_log = True,
                                             typecast_suffix = ""):
     """
-    It makes query statement.
+    It makes query statement for updating multiple statements.
     :param table: table to update.
     :param column_to_update: column name that is to be updated.
     :param columns_to_query_lst: columns name that will we used for where clause.
-    :param query_values_dict_lst: list of dictionary that contains values to update.
-    :param print_debug_log:
+    :param query_values_dict_lst: list of dictionary that contains values to update.:param print_debug_log:
+    :param typecast_suffix:
     :return:
     """
     _prefix = "UPDATE"
@@ -98,9 +99,11 @@ def make_postgres_update_multiple_statement(table,column_to_update,
     where_clause = get_where_clause(columns_to_query_lst)
     statement = " ".join([_prefix, table_name, "SET", keys, from_clause, as_clause, where_clause])
     values = get_values(columns_to_query_lst, query_values_dict_lst)
-    if print_debug_log == True:
-       logging.info("Updating multiple rows into db %s"%(statement))
-    return  statement ,values
+
+    if print_debug_log:
+        logging.info("Updating multiple rows into db %s" % statement)
+
+    return statement, values
 
 
 def make_keys_multicol(columns_to_update_lst):
@@ -109,7 +112,7 @@ def make_keys_multicol(columns_to_update_lst):
         :param columns_to_update_lst:
         :return joined_str: part of postgres query with keys. E.g. "col1=c.updatecol1 , col2=c.updatecol2"
                 update_lst: list of new column names in intermediate tables. E.g. [updatecol1, updatecol2]
-        """
+    """
     key_equal = []
     update_lst = []
     for key in columns_to_update_lst:
@@ -127,7 +130,7 @@ def get_from_clause_multicol(query_values_dict_lst,columns_to_query_lst, columns
         :param columns_to_update_lst:
         :param columns_to_query_lst:
         :return from_str:string. E.g "from (value (%s,%s),(%s,%s))"
-        """
+    """
     from_str = "from (values "
     length = len(columns_to_query_lst)+len(columns_to_update_lst)
     placeholder_str = ["%s"] * length
@@ -155,6 +158,7 @@ def get_as_clause_multicol(columns_to_query_lst, update_param_list):
     as_clause = ",".join(column_str)
     as_clause = "as c(" + as_clause +  ")"
     return as_clause
+
 
 def get_values_multicol(columns_to_query_lst, columns_to_update_lst, query_values_dict_lst ):
     """
@@ -233,6 +237,7 @@ def make_postgres_update_multiple_column_statement(table, columns_to_update_lst,
     where_clause = get_where_clause(columns_to_query_lst)
     statement = " ".join([_prefix, table_name, "SET", keys, from_clause, as_clause, where_clause])
     values = get_values_multicol(columns_to_query_lst, columns_to_update_lst, query_values_dict_lst)
-    if print_debug_log == True:
+
+    if print_debug_log:
         logging.info("Updating multiple rows into db: %s, %s" % (statement, values))
     return statement, values

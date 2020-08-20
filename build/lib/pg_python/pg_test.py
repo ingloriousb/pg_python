@@ -98,6 +98,21 @@ class TestTests(unittest.TestCase):
         print("Read in done")
         clear_table()
 
+    def test_read_null(self):
+        create_rows()
+        values = ['null']
+        rows = pg_python.read(test_table, [COL_1,COL_4], {COL_1: 'title-null', COL_2: values[0]})
+        read_values = []
+        read_values_4 = []
+        for row in rows:
+            read_values.append(row.get(COL_1))
+            read_values_4.append(row.get(COL_4))
+        self.assertEqual(sorted(read_values), ['title-null'])
+        self.assertEqual(sorted(read_values_4), ['sec-value'])
+        print("Read in done")
+        clear_table()
+
+
     def test_read_simple(self):
         create_rows()
         rows = pg_python.read(test_table, [COL_1], {COL_2: 'read'})
@@ -167,6 +182,7 @@ def create_rows():
     pg_python.write(test_table, {COL_1: "title4", COL_2: "read4", COL_3: 77, COL_4: "reeer"})
     pg_python.write(test_table, {COL_1: "title15", COL_2: "read5", COL_3: 77, COL_4: "reeer"})
     pg_python.write(test_table, {COL_1: "title6", COL_2: "read6", COL_3: 77, COL_4: "reeer", COL_5: 20})
+    pg_python.write(test_table, {COL_1: "title-null", COL_4: "sec-value"})
 
 def clear_table():
     pg_python.write_raw("Delete from %s"%(test_table), None)
