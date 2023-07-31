@@ -1,5 +1,5 @@
 xlrd
 beautifulsoup4
-psycopg2
+psycopg2-binary
 scrapy
 selenium
