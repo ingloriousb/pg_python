@@ -1,4 +1,3 @@
-
 from setuptools import setup, find_packages
 from setuptools.command.test import test as TestCommand
 import codecs
@@ -8,9 +7,11 @@ import re
 
 here = os.path.abspath(os.path.dirname(__file__))
 
+
 def read(*parts):
     # intentionally *not* adding an encoding option to open
     return codecs.open(os.path.join(here, *parts), 'r').read()
+
 
 def find_version(*file_paths):
     version_file = read(*file_paths)
@@ -20,13 +21,16 @@ def find_version(*file_paths):
         return version_match.group(1)
     raise RuntimeError("Unable to find version string.")
 
+
 long_description = read('README.rst')
+
 
 class PyTest(TestCommand):
     def finalize_options(self):
         TestCommand.finalize_options(self)
         self.test_args = ['--strict', '--verbose', '--tb=long', 'tests']
         self.test_suite = True
+
 
 setup(
     name='pg_python',
@@ -36,9 +40,10 @@ setup(
     author='Gaurav Bhati',
     install_requires=['xlrd',
                       'beautifulsoup4',
-                      'psycopg2',
+                      'psycopg2-binary',
                       'scrapy',
-                      'selenium'
+                      'selenium',
+                      'pyenchant==3.2.2'
                       ],
     author_email='gaurav.hawker@gmail.com',
     description='A Library to communicate with postgres from python',
@@ -47,7 +52,7 @@ setup(
     include_package_data=True,
     platforms='any',
     zip_safe=False,
-    classifiers = [
+    classifiers=[
         'Programming Language :: Python',
         'Programming Language :: Python :: 2',
         'Development Status :: 4 - Beta',
@@ -59,5 +64,5 @@ setup(
         'Topic :: Software Development :: Libraries :: Python Modules',
         'Topic :: Software Development :: Libraries :: Application Frameworks',
         'Topic :: Internet :: WWW/HTTP :: Dynamic Content',
-        ]
+    ]
 )
