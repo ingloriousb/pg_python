@@ -1,7 +1,3 @@
-from pg_python import pg_python
-import requests
-import logging
-import csv
 import enchant
 
 common_words = {
