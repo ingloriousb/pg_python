@@ -1,5 +1,5 @@
 from . import pg_python
-from . import pg_company
+from .pg_company import find_proper_name
 import unittest
 import logging
 import requests
@@ -179,9 +179,11 @@ class UpdateTests(unittest.TestCase):
 
 class TestCompany(unittest.TestCase):
     def test_company_formatter(self):
-        company_name = "PYROTECH ELECTRONICS (P) Ltd."
-        formated_name = pg_company.find_proper_name(company_name)
-        self.assertEqual(formated_name, "Pyrotech Electronics Private Limited")
+        self.assertEqual(find_proper_name("ENDRESS + HAUSER (I) (PVT). 'LTD"), "Endress + Hauser (India) Private Limited")
+        self.assertEqual(find_proper_name("PYROTECH ELECTRONICS (P) Ltd."), "Pyrotech Electronics Private Limited")
+        self.assertEqual(find_proper_name("LPS Bossard (pv$ limite$)"), "LPS Bossard (Private Limited)")
+        self.assertEqual(find_proper_name("bansal construction co"), "Bansal Construction Company")
+        self.assertEqual(find_proper_name("R K BUILDERS"), "R K Builders")
 
 
 def create_rows():

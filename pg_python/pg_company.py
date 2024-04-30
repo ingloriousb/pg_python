@@ -117,11 +117,11 @@ def find_proper_name(name):
             good_case += 1
             word_tuples.append(("good", word))
             continue
-        if len(word) <= 3:
-            word_tuples.append(("good", word))
-            continue
         if len(word) <= 2:
             word_tuples.append(("good", word.upper()))
+            continue
+        if len(word) <= 3:
+            word_tuples.append(("good", word))
             continue
         bad_case += 1
         word_tuples.append(("bad", word))
