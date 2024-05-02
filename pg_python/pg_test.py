@@ -1,4 +1,5 @@
 from . import pg_python
+from .pg_company import find_proper_name
 import unittest
 import logging
 import requests
@@ -175,6 +176,16 @@ class UpdateTests(unittest.TestCase):
         print("Update multiple row multiple column with two test conditions done")
         clear_table()
 
+
+class TestCompany(unittest.TestCase):
+    def test_company_formatter(self):
+        self.assertEqual(find_proper_name("ENDRESS + HAUSER (I) (PVT). 'LTD"), "Endress + Hauser (India) Private Limited")
+        self.assertEqual(find_proper_name("PYROTECH ELECTRONICS (P) Ltd."), "Pyrotech Electronics Private Limited")
+        self.assertEqual(find_proper_name("LPS Bossard (pv$ limite$)"), "LPS Bossard Private Limited")
+        self.assertEqual(find_proper_name("bansal construction co"), "Bansal Construction Company")
+        self.assertEqual(find_proper_name("R K BUILDERS"), "R K Builders")
+
+
 def create_rows():
     pg_python.write(test_table, {COL_1: "title1", COL_2: "read", COL_3: 76, COL_4: "reeer"})
     pg_python.write(test_table, {COL_1: "title2", COL_2: "read2", COL_3: 77, COL_4: "reeer"})
@@ -183,6 +194,7 @@ def create_rows():
     pg_python.write(test_table, {COL_1: "title15", COL_2: "read5", COL_3: 77, COL_4: "reeer"})
     pg_python.write(test_table, {COL_1: "title6", COL_2: "read6", COL_3: 77, COL_4: "reeer", COL_5: 20})
     pg_python.write(test_table, {COL_1: "title-null", COL_4: "sec-value"})
+
 
 def clear_table():
     pg_python.write_raw("Delete from %s"%(test_table), None)
