@@ -181,7 +181,7 @@ class TestCompany(unittest.TestCase):
     def test_company_formatter(self):
         self.assertEqual(find_proper_name("ENDRESS + HAUSER (I) (PVT). 'LTD"), "Endress + Hauser (India) Private Limited")
         self.assertEqual(find_proper_name("PYROTECH ELECTRONICS (P) Ltd."), "Pyrotech Electronics Private Limited")
-        self.assertEqual(find_proper_name("LPS Bossard (pv$ limite$)"), "LPS Bossard (Private Limited)")
+        self.assertEqual(find_proper_name("LPS Bossard (pv$ limite$)"), "LPS Bossard Private Limited")
         self.assertEqual(find_proper_name("bansal construction co"), "Bansal Construction Company")
         self.assertEqual(find_proper_name("R K BUILDERS"), "R K Builders")
 

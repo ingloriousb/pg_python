@@ -25,7 +25,6 @@ common_words = {
     'pl$': 'Private Limited',
     'limite$': 'Limited',
     'pv$': 'Private',
-
     '(prop)': 'Proprietor',
     'prop': 'Proprietor',
     'constt': 'Construction',
@@ -58,6 +57,7 @@ after_words_map = {
     ' Private LT$': ' Private Limited',
     ' P$': ' Private',
     ' Government Cont$': ' Government Contractor',
+    '(Private Limited)': 'Private Limited',
 }
 
 NONE_LIST = ["None", None, "none", "null", "<null>", "", [], {}, set(), tuple(), '[]', '{}', [None], ['None'], 'nan', 'Nan', "NA", "Na"]
