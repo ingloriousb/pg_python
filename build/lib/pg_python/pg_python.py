@@ -163,7 +163,6 @@ def update(table, update_kv_map, where_kv_map, clause='=', server="default"):
                                                      clause, print_debug_log)
     try:
         cursor.execute(command, values)
-        return_dict = {'Status': True}
         if print_debug_log:
             logging.info("%s Record(s) Updated", cursor.rowcount)
         connection.commit()
@@ -173,7 +172,7 @@ def update(table, update_kv_map, where_kv_map, clause='=', server="default"):
         db_dict.pop(server)
         db_dict[server] = db_obj_reconnect
         return False
-    return return_dict
+    return True
 
 
 @server_connection_check
@@ -369,10 +368,9 @@ def update_multiple(table, column_to_update, columns_to_query_lst,
                                                               typecast_suffix=typecast)
     try:
         cursor.execute(command, values)
-        return_dict = {'Status': True}
+        return_dict = {'status': True}
         count = cursor.rowcount
         return_dict['rowcount'] = count
-
         connection.commit()
     except Exception as e:
         logging.warning("Db Cursor update_multiple Error: %s" % e)
