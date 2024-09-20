@@ -3,12 +3,14 @@ from .pg_company import find_proper_name
 import unittest
 import logging
 import requests
+import json
 
 COL_1 = "col1"
 COL_2 = "col2"
 COL_3 = "col3"
 COL_4 = "col4"
 COL_5 = "int_value"
+COL_6 = "jsonb_value"
 UPDATE = "update"
 test_table = "pg_python_test"
 
@@ -122,6 +124,15 @@ class TestTests(unittest.TestCase):
         print("Read simple done")
         clear_table()
 
+    def test_read_jsonb(self):
+        create_rows()
+        rows = pg_python.read(test_table, [COL_6], {COL_1: 'title-jsonb'}, cols_keep_raw_type=[COL_6])
+        self.assertEqual(len(rows), 1)
+        print(type(rows[0][COL_6]))
+        self.assertEqual(rows[0][COL_6], {'key1': 'value1'})
+        print("Read jsonb done")
+        clear_table()
+
     def test_read_greater_than(self):
         create_rows()
         rows = pg_python.read(test_table, [COL_1], {COL_5 + " >": 10})
@@ -194,6 +205,7 @@ def create_rows():
     pg_python.write(test_table, {COL_1: "title15", COL_2: "read5", COL_3: 77, COL_4: "reeer"})
     pg_python.write(test_table, {COL_1: "title6", COL_2: "read6", COL_3: 77, COL_4: "reeer", COL_5: 20})
     pg_python.write(test_table, {COL_1: "title-null", COL_4: "sec-value"})
+    pg_python.write(test_table, {COL_1: "title-jsonb", COL_6: json.dumps({'key1': 'value1'})})
 
 
 def clear_table():
