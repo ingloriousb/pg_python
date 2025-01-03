@@ -17,13 +17,14 @@ print_debug_log = True
 params_map = {}
 
 
-def pg_server(db_name, username, password, host_address, debug=True, send_keep_alive_probes=False, socket_idle_time=120):
+def pg_server(db_name, username, password, host_address, port: int = 5432, debug=True, send_keep_alive_probes=False, socket_idle_time=120):
   global crawler_db, print_debug_log, params_map
   params_map = {
     'dbname': db_name,
     'user': username,
     'password': password,
     'host': host_address,
+    'port': port,
     'send_keep_alive_probes': send_keep_alive_probes,
     'socket_idle_time': socket_idle_time,
     }
