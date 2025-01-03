@@ -1,5 +1,5 @@
-from . import pg_python
-from .pg_company import find_proper_name
+from pg_python import pg_python
+from pg_python.pg_company import find_proper_name
 import unittest
 import logging
 import requests

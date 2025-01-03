@@ -62,7 +62,9 @@ def server_connection_check(func):
     return wrapper
 
 
-def pg_server(db_name, username, password, host_address, port: int = 5432, debug=True, server="default", send_keep_alive_probes=False, socket_idle_time=120, application_name='pg_python'):
+def pg_server(db_name, username, password, host_address, debug=True, server="default",
+              send_keep_alive_probes=False, socket_idle_time=120, application_name='pg_python',
+              port=5432):
     global print_debug_log
     # no need to make socket so, send_keep_alive_probes will no longer usefull
     params_map = {
